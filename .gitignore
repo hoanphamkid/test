@@ -13,3 +13,6 @@
 .externalNativeBuild
 .cxx
 local.properties
+# Backend Node artifacts
+backend/node_modules/
+backend/.env

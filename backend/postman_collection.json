@@ -1,0 +1,373 @@
+{
+  "info": {
+    "name": "CANDY COOKING APP API",
+    "_postman_id": "asm-backend-collection",
+    "description": "Collection kiểm thử các API ASM (User / Category / Product / Recipe / Messaging) và tương thích Android.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. User Management",
+      "item": [
+        {
+          "name": "Đăng ký tài khoản (multipart)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Người dùng mới", "type": "text" },
+                { "key": "email", "value": "user@example.com", "type": "text" },
+                { "key": "password", "value": "123456", "type": "text" },
+                { "key": "avatar", "type": "file", "src": "" }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/asm/reg-mail",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "asm", "reg-mail"]
+            }
+          }
+        },
+        {
+          "name": "Đăng nhập",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/asm/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "asm", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "if (jsonData.token) {",
+                  "  pm.collectionVariables.set('asmToken', jsonData.token);",
+                  "}",
+                  "if (jsonData.data && jsonData.data.id) {",
+                  "  pm.collectionVariables.set('userId', jsonData.data.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cập nhật mật khẩu",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password\": \"matkhau_moi\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/asm/update-password/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "asm", "update-password", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "Danh sách user",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/asm/get-all-user",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "asm", "get-all-user"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Category Management",
+      "item": [
+        {
+          "name": "Thêm danh mục",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Healthy\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/asm/add-danhmuc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "asm", "add-danhmuc"]
+            }
+          }
+        },
+        {
+          "name": "Danh sách danh mục",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/asm/get-all-danhmuc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "asm", "get-all-danhmuc"]
+            }
+          }
+        },
+        {
+          "name": "Xóa danh mục",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/asm/delete-danhmuc/{{categoryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "asm", "delete-danhmuc", "{{categoryId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Product Management",
+      "item": [
+        {
+          "name": "Thêm sản phẩm",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sản phẩm A\",\n  \"description\": \"Mô tả sản phẩm\",\n  \"price\": 120000,\n  \"image\": \"https://example.com/image.jpg\",\n  \"categoryid\": \"{{categoryId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/asm/add-sanpham",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "asm", "add-sanpham"]
+            }
+          }
+        },
+        {
+          "name": "Lấy sản phẩm theo danh mục",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/asm/get-sanpham-danhmuc/{{categoryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "asm", "get-sanpham-danhmuc", "{{categoryId}}"]
+            }
+          }
+        },
+        {
+          "name": "Chi tiết sản phẩm",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/asm/sanpham/{{productId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "asm", "sanpham", "{{productId}}"]
+            }
+          }
+        },
+        {
+          "name": "Tìm kiếm sản phẩm",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/asm/sanpham/search?keyword=san%20pham",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "asm", "sanpham", "search"],
+              "query": [
+                { "key": "keyword", "value": "san pham" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Cập nhật sản phẩm",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sản phẩm A (mới)\",\n  \"price\": 150000,\n  \"categoryid\": \"{{categoryId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/asm/update-sanpham/{{productId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "asm", "update-sanpham", "{{productId}}"]
+            }
+          }
+        },
+        {
+          "name": "Cập nhật ảnh sản phẩm",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"image\": \"https://example.com/new-image.jpg\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/asm/update-sanpham-image/{{productId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "asm", "update-sanpham-image", "{{productId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Recipe Management",
+      "item": [
+        {
+          "name": "Thêm công thức",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Healthy Salad\",\n  \"description\": \"Rau củ sạch\",\n  \"duration\": \"15 phút\",\n  \"categoryid\": \"{{categoryId}}\",\n  \"imageUrl\": \"https://example.com/salad.jpg\",\n  \"authorName\": \"Admin\",\n  \"authorEmail\": \"admin@candycancook.com\",\n  \"steps\": [\n    { \"title\": \"Chuẩn bị\", \"description\": \"Rửa rau\" },\n    { \"title\": \"Trộn\", \"description\": \"Pha sốt\" }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/asm/recipes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "asm", "recipes"]
+            }
+          }
+        },
+        {
+          "name": "Danh sách công thức",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/asm/recipes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "asm", "recipes"]
+            }
+          }
+        },
+        {
+          "name": "Công thức theo danh mục",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/asm/recipes/category/{{categoryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "asm", "recipes", "category", "{{categoryId}}"]
+            }
+          }
+        },
+        {
+          "name": "Công thức theo sản phẩm",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/asm/recipes/product/{{productId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "asm", "recipes", "product", "{{productId}}"]
+            }
+          }
+        },
+        {
+          "name": "Chi tiết công thức",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/asm/recipes/{{recipeId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "asm", "recipes", "{{recipeId}}"]
+            }
+          }
+        },
+        {
+          "name": "Xóa công thức",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/asm/recipes/{{recipeId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "asm", "recipes", "{{recipeId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Messaging",
+      "item": [
+        {
+          "name": "Gửi tin nhắn",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"senderEmail\": \"admin@candycancook.com\",\n  \"receiverEmail\": \"user@example.com\",\n  \"content\": \"Chào bạn!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/asm/messages",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "asm", "messages"]
+            }
+          }
+        },
+        {
+          "name": "Xem hội thoại",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/asm/messages/thread?userA=admin@candycancook.com&userB=user@example.com",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "asm", "messages", "thread"],
+              "query": [
+                { "key": "userA", "value": "admin@candycancook.com" },
+                { "key": "userB", "value": "user@example.com" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Inbox theo email",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/asm/messages/inbox/user@example.com",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "asm", "messages", "inbox", "user@example.com"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:4000" },
+    { "key": "asmToken", "value": "" },
+    { "key": "userId", "value": "" },
+    { "key": "categoryId", "value": "" },
+    { "key": "productId", "value": "" },
+    { "key": "recipeId", "value": "" }
+  ]
+}
+
