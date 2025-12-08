@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
+    "drop:collections": "node scripts/dropCollections.js",
     "lint": "echo \"No lint configured\" && exit 0",
     "test": "echo \"No tests configured\" && exit 0"
   },

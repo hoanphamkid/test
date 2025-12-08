@@ -16,6 +16,7 @@ Tạo file `.env` với các biến:
 ```
 PORT=4000
 MONGODB_URI=mongodb://localhost:27017/asm
+DEFAULT_RESET_PASSWORD=123456
 
 # SMTP phục vụ gửi email đăng ký (Gmail hoặc dịch vụ khác)
 SMTP_HOST=smtp.gmail.com
@@ -73,6 +74,13 @@ Server mặc định chạy tại `http://localhost:4000`. Mọi endpoint đư�
 | `GET`  | `/api/asm/check-gio/:accountid` | Xem giỏ hàng hiện tại (bill + items) |
 | `DELETE` | `/api/asm/cart/remove/:billdetailid` | Xóa 1 item trong giỏ |
 | `PUT`  | `/api/asm/cart/thanhtoan` | Thanh toán danh sách item (`detailIds`), cập nhật trạng thái “Đã thanh toán” và tính tổng tiền |
+
+## 5. User Submitted Recipes
+
+| Method | Path | Mô tả |
+| ------ | ---- | ----- |
+| `GET` | `/api/asm/user-recipes` | Danh sách công thức người dùng gửi (filter theo `status`, `authorEmail`, có phân trang `page`, `limit`) |
+| `GET` | `/api/asm/user-recipes/:id` | Chi tiết một công thức người dùng gửi |
 
 ## Cấu trúc dữ liệu chính
 

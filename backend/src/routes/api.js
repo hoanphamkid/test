@@ -454,13 +454,13 @@ const handleForgotPassword = async (req, res) => {
       });
     }
 
-    const temporaryPassword = Math.random().toString(36).slice(-8);
+    const temporaryPassword = process.env.DEFAULT_RESET_PASSWORD?.trim() || '123456';
     account.password = temporaryPassword;
     await account.save();
 
     return res.json({
       status: 200,
-      messenger: 'Đã tạo mật khẩu tạm thời',
+      messenger: 'Đã đặt lại mật khẩu về mặc định',
       temporaryPassword,
     });
   } catch (error) {
@@ -662,6 +662,82 @@ router.delete('/recipes/pending/:id', async (req, res) => {
     console.error('DELETE /recipes/pending/:id error:', error);
     return res.status(error.status || 500).json({
       message: error.message || 'Lỗi server',
+    });
+  }
+});
+
+router.get('/asm/user-recipes', async (req, res) => {
+  try {
+    const { status = 'ALL', authorEmail, page = 1, limit = 10 } = req.query || {};
+    const normalizedStatus = status.trim().toUpperCase();
+    const normalizedAuthorEmail = normalizeEmail(authorEmail);
+    const pagination = {
+      page: Math.max(parseInt(page, 10) || 1, 1),
+      limit: Math.min(Math.max(parseInt(limit, 10) || 10, 1), 50),
+    };
+    const filter = {};
+    if (normalizedStatus !== 'ALL') {
+      if (!PENDING_STATUSES.includes(normalizedStatus)) {
+        return res.status(400).json({
+          status: 400,
+          messenger: 'Trạng thái không hợp lệ',
+          data: [],
+        });
+      }
+      filter.status = normalizedStatus;
+    }
+    if (normalizedAuthorEmail) {
+      filter.authorEmail = normalizedAuthorEmail;
+    }
+
+    const [items, total] = await Promise.all([
+      PendingRecipe.find(filter)
+        .sort({ createdAt: -1 })
+        .skip((pagination.page - 1) * pagination.limit)
+        .limit(pagination.limit),
+      PendingRecipe.countDocuments(filter),
+    ]);
+
+    return res.json({
+      status: 200,
+      messenger: 'Danh sách công thức người dùng gửi',
+      pagination: {
+        ...pagination,
+        total,
+        totalPages: Math.max(Math.ceil(total / pagination.limit), 1),
+      },
+      data: items.map(mapPendingRecipe),
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: 500,
+      messenger: 'Lỗi server khi lấy danh sách công thức người dùng gửi',
+      error: error.message,
+    });
+  }
+});
+
+router.get('/asm/user-recipes/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    ensureObjectId(id);
+    const recipe = await PendingRecipe.findById(id);
+    if (!recipe) {
+      return res.status(404).json({
+        status: 404,
+        messenger: 'Không tìm thấy công thức',
+      });
+    }
+    return res.json({
+      status: 200,
+      messenger: 'Chi tiết công thức người dùng gửi',
+      data: mapPendingRecipe(recipe),
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: 500,
+      messenger: 'Lỗi server khi lấy chi tiết công thức người dùng gửi',
+      error: error.message,
     });
   }
 });
